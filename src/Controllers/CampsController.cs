@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace CoreCodeCamp.Controllers
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class CampsController : ControllerBase
     {
         private readonly ICampRepository _repository;
@@ -27,9 +28,6 @@ namespace CoreCodeCamp.Controllers
         [HttpGet]
         public async Task<ActionResult<CampModel[]>> Get( bool includeTalks = false)
         {
-
-             
-
             try
             {
                 var results = await _repository.GetAllCampsAsync(includeTalks);
@@ -77,6 +75,20 @@ namespace CoreCodeCamp.Controllers
             }
         }
 
+        public async Task<ActionResult<CampModel>> Post(CampModel model)
+        {
+            try
+            {
+                // Create a new camp
+                var camp = _mapper.Map<Camp>(model);
+                
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Database Error");
+             }
+        }
 
 
     }
