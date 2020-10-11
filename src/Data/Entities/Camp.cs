@@ -6,7 +6,7 @@ namespace CoreCodeCamp.Data
 {
   public class Camp
   {
-    public int CampId { get; set; }
+   public int CampId { get; set; }
     public string Name { get; set; }
     public string Moniker { get; set; }
     public Location Location  { get; set; }

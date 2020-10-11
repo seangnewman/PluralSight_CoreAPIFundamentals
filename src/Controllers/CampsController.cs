@@ -25,6 +25,7 @@ namespace CoreCodeCamp.Controllers
             _repository = repository;
             _mapper = mapper;
             _linkGenerator = linkGenerator;
+
         }
 
 
@@ -84,13 +85,14 @@ namespace CoreCodeCamp.Controllers
             {
 
                 var existing = await _repository.GetCampAsync(model.Moniker);
-                if( existing != null)
+                if (existing != null)
                 {
                     return BadRequest("Moniker in Use");
                 }
 
-                var location = _linkGenerator.GetPathByAction("Get","Camps", new  { 
-                  moniker = model.Moniker
+                var location = _linkGenerator.GetPathByAction("Get", "Camps", new
+                {
+                    moniker = model.Moniker
                 });
 
                 if (string.IsNullOrWhiteSpace(location))
@@ -98,11 +100,15 @@ namespace CoreCodeCamp.Controllers
                     return BadRequest("Could not use current moniker");
                 }
                 // Create a new camp
-                var camp = _mapper.Map<Camp>(model);
-                _repository.Add(camp);
+                //var camp = _mapper.Map<Camp>(model);
+
+                var newCamp = new Camp();
+                Mapping.Map2Camp(newCamp, model);
+
+                _repository.Add(newCamp);
                 if (await _repository.SaveChangesAsync())
                 {
-                    return Created("", _mapper.Map<CampModel>(camp));
+                    return Created("", _mapper.Map<CampModel>(newCamp));
                 }
 
                 return Ok();
@@ -111,8 +117,63 @@ namespace CoreCodeCamp.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Database Error");
             }
-            return BadRequest();
+            
 
+        }
+
+        [HttpPut("{moniker}")]
+        public async Task<ActionResult<CampModel>> Put(string moniker, CampModel model)
+        {
+            try
+            {
+                var oldCamp = await _repository.GetCampAsync(moniker);
+                if (oldCamp == null)
+                {
+                    return NotFound($"Cound not find camp with moniker of {moniker}");
+                }
+                //_mapper.Map(model, oldCamp);
+
+                Mapping.Map2Camp(oldCamp, model);
+
+
+
+                if (await _repository.SaveChangesAsync())
+                {
+                    return _mapper.Map<CampModel>(oldCamp);
+                }
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
+            return BadRequest();
+        }
+
+        [HttpDelete("{moniker}")]
+        public async Task<IActionResult> Delete(string moniker)
+        {
+            try
+            {
+                var oldCamp = await _repository.GetCampAsync(moniker);
+                if (oldCamp == null)
+                {
+                    return NotFound($"Cound not find camp with moniker of {moniker}");
+                }
+
+                _repository.Delete(oldCamp);
+                if (await _repository.SaveChangesAsync())
+                {
+                    return Ok();
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
+            return BadRequest("Failed to remove camp");
         }
 
 
