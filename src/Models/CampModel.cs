@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace CoreCodeCamp.Models
 {
     public class CampModel
     {
+        [Required]
+        [StringLength(100)]
         public string Name { get; set; }
+        [Required]
         public string Moniker { get; set; }
         public DateTime EventDate { get; set; } = DateTime.MinValue;
+        [Range(1,100)]
         public int Length { get; set; } = 1;
 
         // Prefixing each with name of location allows automapper to find them
