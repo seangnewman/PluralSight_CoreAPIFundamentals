@@ -100,15 +100,15 @@ namespace CoreCodeCamp.Controllers
                     return BadRequest("Could not use current moniker");
                 }
                 // Create a new camp
-                //var camp = _mapper.Map<Camp>(model);
+                var camp = _mapper.Map<Camp>(model);
 
-                var newCamp = new Camp();
-                Mapping.Map2Camp(newCamp, model);
+                //var newCamp = new Camp();
+                //Mapping.Map2Camp(newCamp, model);
 
-                _repository.Add(newCamp);
+                _repository.Add(camp);
                 if (await _repository.SaveChangesAsync())
                 {
-                    return Created("", _mapper.Map<CampModel>(newCamp));
+                    return Created("", _mapper.Map<CampModel>(camp));
                 }
 
                 return Ok();
@@ -131,9 +131,9 @@ namespace CoreCodeCamp.Controllers
                 {
                     return NotFound($"Cound not find camp with moniker of {moniker}");
                 }
-                //_mapper.Map(model, oldCamp);
+                _mapper.Map(model, oldCamp);
 
-                Mapping.Map2Camp(oldCamp, model);
+                //Mapping.Map2Camp(oldCamp, model);
 
 
 
